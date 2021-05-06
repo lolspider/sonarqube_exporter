@@ -1,0 +1,5 @@
+PORT: 8991
+SONARQUBE_URL: https://sonarqube.projects.com.cn
+AUTH_TOKEN: "*********"
+PROJECT_API: "/api/components/search?qualifiers=TRK&ps=500"
+METRICS_API: "/api/measures/search_history?metrics=coverage&ps=1000"

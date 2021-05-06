@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarqube-exporter
+  labels:
+    app: sonarqube-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube-exporter
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8991"
+        prometheus.io/scrape: "true"
+      labels:
+        app: sonarqube-exporter
+    spec:
+      containers:
+      - name: sonarqube-exporter
+        image: sonarqube-exporter:0.1.0
+        ports:
+          - containerPort: 8991
+            name: http
+            protocol: TCP
+        volumeMounts:
+          - mountPath: /app/config.yaml
+            name: config-volume
+            subPath: config.yaml
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8991
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 10
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8991
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 10
+        resources:
+          limits:
+            memory: 500M
+          requests:
+            memory: 50M
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: sonarqube-exporter-configmap
+          name: config-volume
